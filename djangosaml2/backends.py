@@ -39,8 +39,12 @@ except AttributeError:
 
 class Saml2Backend(ModelBackend):
 
+    def __init__(self, **kwargs):
+        super(Saml2Backend, self).__init__()
+        self.kwargs = kwargs
+
     def authenticate(self, session_info=None, attribute_mapping=None,
-                     create_unknown_user=True):
+                     create_unknown_user=True, tenant=None):
         if session_info is None or attribute_mapping is None:
             logger.error('Session info or attribute mapping are None')
             return None
@@ -222,3 +226,4 @@ class Saml2Backend(ModelBackend):
             return True
 
         return False
+pd
