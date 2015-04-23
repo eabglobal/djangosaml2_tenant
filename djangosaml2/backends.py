@@ -226,4 +226,3 @@ class Saml2Backend(ModelBackend):
             return True
 
         return False
-pd
