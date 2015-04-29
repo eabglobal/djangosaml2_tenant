@@ -52,13 +52,17 @@ def get_config_loader(path, request=None):
     return config_loader
 
 
-def config_settings_loader(request=None):
+def config_settings_loader(request):
     """Utility function to load the pysaml2 configuration.
 
     This is also the default config loader.
+    This sets the metadata to depend on the tenant
     """
+
     conf = SPConfig()
-    conf.load(copy.deepcopy(settings.SAML_CONFIG))
+    tenant_config = copy.deepcopy(settings.SAML_CONFIG)
+    tenant_config["metadata"]["local"] = settings.SAML_CONFIG["metadata"]["local"][request.tenant.name]
+    conf.load(tenant_config)
     return conf
 
 
