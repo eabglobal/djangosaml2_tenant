@@ -117,7 +117,8 @@ class Saml2Backend(ModelBackend):
                 user = self.update_user(user, attributes, attribute_mapping)
             except User.DoesNotExist:
                 logger.error('The user "%s" does not exist' % main_attribute)
-                return None
+                
+                return main_attribute
             except MultipleObjectsReturned:
                 logger.error("There are more than one user with %s = %s" %
                              (django_user_main_attribute, main_attribute))
