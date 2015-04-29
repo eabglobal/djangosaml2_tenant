@@ -21,7 +21,7 @@ from django.utils.importlib import import_module
 
 from saml2.config import SPConfig
 
-from djangosaml2.utils import get_custom_setting
+from djangosaml2.utils import get_custom_setting, get_endpoints
 
 
 def get_config_loader(path, request=None):
@@ -58,11 +58,15 @@ def config_settings_loader(request):
     This is also the default config loader.
     This sets the metadata to depend on the tenant
     """
-
     conf = SPConfig()
     tenant_config = copy.deepcopy(settings.SAML_CONFIG)
-    tenant_config["metadata"]["local"] = settings.SAML_CONFIG["metadata"]["local"][request.tenant.name]
+    if "local" in settings.SAML_CONFIG["metadata"]:
+        tenant_config["metadata"]["local"] = settings.SAML_CONFIG["metadata"]["local"][request.tenant.name]
+    if "remote" in settings.SAML_CONFIG["metadata"]:
+        tenant_config["metadata"]["remote"] = settings.SAML_CONFIG["metadata"]["remote"][request.tenant.name]
+    tenant_config["service"]["sp"]["endpoints"] = get_endpoints(request)
     conf.load(tenant_config)
+
     return conf
 
 
