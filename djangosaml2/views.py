@@ -154,7 +154,6 @@ def assertion_consumer_service(request,
     create_unknown_user = create_unknown_user or get_custom_setting(
             'SAML_CREATE_UNKNOWN_USER', True)
     logger.debug('Assertion Consumer Service started')
-
     conf = get_config(config_loader_path, request)
     if 'SAMLResponse' not in request.POST:
         return HttpResponseBadRequest(
@@ -187,7 +186,8 @@ def assertion_consumer_service(request,
     logger.debug('Trying to authenticate the user')
     user = auth.authenticate(session_info=session_info,
                              attribute_mapping=attribute_mapping,
-                             create_unknown_user=create_unknown_user)
+                             create_unknown_user=create_unknown_user,
+                             tenant=request.tenant)
     if user is None:
         logger.error('The user is None')
         return HttpResponseForbidden("Permission denied")

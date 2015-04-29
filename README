@@ -1,8 +1,10 @@
 .. contents::
 
-===========
-djangosaml2
-===========
+==================
+djangosaml2_tenant
+==================
+
+djangosaml2_tenant is a fork of djangosaml2 which adds handling for tenant.
 
 djangosaml2 is a Django application that integrates the PySAML2 library
 into your project. This mean that you can protect your Django based project
