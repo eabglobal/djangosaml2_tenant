@@ -61,9 +61,9 @@ def config_settings_loader(request):
     conf = SPConfig()
     tenant_config = copy.deepcopy(settings.SAML_CONFIG)
     if "local" in settings.SAML_CONFIG["metadata"]:
-        tenant_config["metadata"]["local"] = settings.SAML_CONFIG["metadata"]["local"][request.tenant.name]
+        tenant_config["metadata"]["local"] = settings.SAML_CONFIG["metadata"]["local"][request.tenant.schema_name]
     if "remote" in settings.SAML_CONFIG["metadata"]:
-        tenant_config["metadata"]["remote"] = settings.SAML_CONFIG["metadata"]["remote"][request.tenant.name]
+        tenant_config["metadata"]["remote"] = settings.SAML_CONFIG["metadata"]["remote"][request.tenant.schema_name]
     tenant_config["service"]["sp"]["endpoints"] = get_endpoints(request)
     conf.load(tenant_config)
 
