@@ -14,15 +14,20 @@
 # limitations under the License.
 
 import copy
+import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 from saml2.config import SPConfig
 
+import djangosaml2
 from djangosaml2.utils import get_custom_setting, get_endpoints
 
+BASE_PATH = os.path.dirname(os.path.dirname(djangosaml2.__file__))
 
 def get_config_loader(path, request=None):
     i = path.rfind('.')
@@ -61,7 +66,24 @@ def config_settings_loader(request):
     conf = SPConfig()
     tenant_config = copy.deepcopy(settings.SAML_CONFIG)
     if "local" in settings.SAML_CONFIG["metadata"]:
-        tenant_config["metadata"]["local"] = settings.SAML_CONFIG["metadata"]["local"][request.tenant.schema_name]
+        default_storage_objects = settings.SAML_CONFIG["metadata"]["local"][request.tenant.schema_name]
+        # Local files might be s3 objects
+        # If yes they should be copied locally as saml2 only works with local files
+        directory = os.path.join(BASE_PATH, request.tenant.schema_name)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        local_files = []
+        for object_name in default_storage_objects:
+            path = os.path.join(directory, object_name)
+            if not os.path.exists(path):
+                # We need this here in spite of makedirs above as s3 object names can have /
+                if not os.path.exists(os.path.dirname(path)):
+                    os.makedirs(os.path.dirname(path))
+                file_content = default_storage.open(object_name).read()
+                with open(path, "w") as open_file:
+                    open_file.write(file_content)
+            local_files.append(path)
+        tenant_config["metadata"]["local"] = local_files
     if "remote" in settings.SAML_CONFIG["metadata"]:
         tenant_config["metadata"]["remote"] = settings.SAML_CONFIG["metadata"]["remote"][request.tenant.schema_name]
     tenant_config["service"]["sp"]["endpoints"] = get_endpoints(request)
