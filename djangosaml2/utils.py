@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#            http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 import saml2
 
 
@@ -38,11 +39,13 @@ def available_idps(config, langpref=None):
 
 
 def get_endpoints(request):
+    protocal = 'https' if request.is_secure() else 'http'
     return {
         # url and binding to the assetion consumer service view
         # do not change the binding or service name
         'assertion_consumer_service': [
-            ('{0}saml2/acs/'.format(request.tenant.domain_url),
+            ('{}://{}:{}{}'.format(protocal, request.tenant.domain_url, request.META['SERVER_PORT'],
+                                   reverse('saml2_acs')),
              saml2.BINDING_HTTP_POST),
         ],
     }
