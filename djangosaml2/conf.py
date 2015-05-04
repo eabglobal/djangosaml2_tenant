@@ -100,6 +100,7 @@ def get_config(config_loader_path=None, request=None):
         config_loader_path = config_loader_path or get_custom_setting(
             'SAML_CONFIG_LOADER', 'djangosaml2.conf.config_settings_loader')
 
-        sp_config = config_loader = get_config_loader(config_loader_path)
-        _sp_config_map[request.tenant.schema_name] = config_loader(request)
+        config_loader = get_config_loader(config_loader_path)
+        sp_config = config_loader(request)
+        _sp_config_map[request.tenant.schema_name] = sp_config
     return sp_config
