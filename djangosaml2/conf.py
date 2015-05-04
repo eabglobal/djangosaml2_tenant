@@ -5,7 +5,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#            http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,19 +15,21 @@
 
 import copy
 import os
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 
 from saml2.config import SPConfig
 
 import djangosaml2
 from djangosaml2.utils import get_custom_setting, get_endpoints
 
+
 BASE_PATH = os.path.dirname(os.path.dirname(djangosaml2.__file__))
+
+_sp_config_map = {}
+
 
 def get_config_loader(path, request=None):
     i = path.rfind('.')
@@ -41,14 +43,14 @@ def get_config_loader(path, request=None):
         raise ImproperlyConfigured(
             'Error importing SAML config loader. Is SAML_CONFIG_LOADER '
             'a correctly string with a callable path?'
-            )
+        )
     try:
         config_loader = getattr(mod, attr)
     except AttributeError:
         raise ImproperlyConfigured(
             'Module "%s" does not define a "%s" config loader' %
             (module, attr)
-            )
+        )
 
     if not hasattr(config_loader, '__call__'):
         raise ImproperlyConfigured(
@@ -93,8 +95,11 @@ def config_settings_loader(request):
 
 
 def get_config(config_loader_path=None, request=None):
-    config_loader_path = config_loader_path or get_custom_setting(
-        'SAML_CONFIG_LOADER', 'djangosaml2.conf.config_settings_loader')
+    sp_config = _sp_config_map.get(request.tenant.schema_name, None)
+    if not sp_config:
+        config_loader_path = config_loader_path or get_custom_setting(
+            'SAML_CONFIG_LOADER', 'djangosaml2.conf.config_settings_loader')
 
-    config_loader = get_config_loader(config_loader_path)
-    return config_loader(request)
+        sp_config = config_loader = get_config_loader(config_loader_path)
+        _sp_config_map[request.tenant.schema_name] = config_loader(request)
+    return sp_config
