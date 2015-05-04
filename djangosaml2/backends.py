@@ -5,7 +5,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#            http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,6 @@
 # limitations under the License.
 
 import logging
-
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.backends import ModelBackend
@@ -28,7 +27,6 @@ except ImportError:
     class SiteProfileNotAvailable(Exception):
         pass
 
-
 logger = logging.getLogger('djangosaml2')
 
 # Django 1.5 Custom user model
@@ -37,8 +35,8 @@ try:
 except AttributeError:
     User = auth.models.User
 
-class Saml2Backend(ModelBackend):
 
+class Saml2Backend(ModelBackend):
     def __init__(self, **kwargs):
         super(Saml2Backend, self).__init__()
         self.kwargs = kwargs
@@ -116,8 +114,9 @@ class Saml2Backend(ModelBackend):
                 user = User.objects.get(**user_query_args)
                 user = self.update_user(user, attributes, attribute_mapping)
             except User.DoesNotExist:
-                logger.error('The user "%s" does not exist' % main_attribute)
-                
+                # this is not necessarily an error. the calling method
+                # will use returned username to create User
+                logger.info('The user "%s" does not exist' % main_attribute)
                 return main_attribute
             except MultipleObjectsReturned:
                 logger.error("There are more than one user with %s = %s" %
@@ -197,7 +196,7 @@ class Saml2Backend(ModelBackend):
              in pre_user_save.send_robust(sender=user,
                                           attributes=attributes,
                                           user_modified=user_modified)]
-            )
+        )
 
         if user_modified or signal_modified or force_save:
             user.save()
