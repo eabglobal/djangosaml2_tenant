@@ -26,8 +26,7 @@ import djangosaml2
 from djangosaml2.utils import get_custom_setting, get_endpoints
 
 
-BASE_PATH = settings.SAML2_IDP_BASE_DIR if settings.SAML2_IDP_BASE_DIR else os.path.dirname(
-    os.path.dirname(djangosaml2.__file__))
+BASE_PATH = getattr(settings, 'SAML2_IDP_BASE_DIR', os.path.dirname(djangosaml2.__file__))
 
 _sp_config_map = {}
 
