@@ -5,7 +5,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#            http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,11 +26,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout as django_logout
 from django.http import Http404, HttpResponse
 from django.http import HttpResponseRedirect  # 30x
-from django.http import  HttpResponseBadRequest, HttpResponseForbidden  # 40x
+from django.http import HttpResponseBadRequest, HttpResponseForbidden  # 40x
 from django.http import HttpResponseServerError  # 50x
 from django.views.decorators.http import require_POST
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+
 try:
     from django.views.decorators.csrf import csrf_exempt
 except ImportError:
@@ -102,8 +103,8 @@ def login(request,
         else:
             logger.debug('User is already logged in')
             return render_to_response(authorization_error_template, {
-                    'came_from': came_from,
-                    }, context_instance=RequestContext(request))
+                'came_from': came_from,
+            }, context_instance=RequestContext(request))
 
     selected_idp = request.GET.get('idp', None)
     conf = get_config(config_loader_path, request)
@@ -113,16 +114,16 @@ def login(request,
     if selected_idp is None and len(idps) > 1:
         logger.debug('A discovery process is needed')
         return render_to_response(wayf_template, {
-                'available_idps': idps.items(),
-                'came_from': came_from,
-                }, context_instance=RequestContext(request))
+            'available_idps': idps.items(),
+            'came_from': came_from,
+        }, context_instance=RequestContext(request))
 
     client = Saml2Client(conf)
     try:
         (session_id, result) = client.prepare_for_authenticate(
             entityid=selected_idp, relay_state=came_from,
             binding=BINDING_HTTP_REDIRECT,
-            )
+        )
     except TypeError, e:
         logger.error('Unable to know which IdP to use')
         return HttpResponse(unicode(e))
@@ -150,9 +151,9 @@ def assertion_consumer_service(request,
     enabled in the settings.py
     """
     attribute_mapping = attribute_mapping or get_custom_setting(
-            'SAML_ATTRIBUTE_MAPPING', {'uid': ('username', )})
+        'SAML_ATTRIBUTE_MAPPING', {'uid': ('username', )})
     create_unknown_user = create_unknown_user or get_custom_setting(
-            'SAML_CREATE_UNKNOWN_USER', True)
+        'SAML_CREATE_UNKNOWN_USER', True)
     logger.debug('Assertion Consumer Service started')
     conf = get_config(config_loader_path, request)
     if 'SAMLResponse' not in request.POST:
@@ -187,7 +188,7 @@ def assertion_consumer_service(request,
     user = auth.authenticate(session_info=session_info,
                              attribute_mapping=attribute_mapping,
                              create_unknown_user=create_unknown_user,
-                             tenant=request.tenant)
+                             tenant=getattr(request, 'tenant', None))
     if user is None:
         logger.error('The user is None')
         return HttpResponseForbidden("Permission denied")
@@ -285,7 +286,7 @@ def logout_service_post(request, *args, **kwargs):
 
 
 def do_logout_service(request, data, binding, config_loader_path=None, next_page=None,
-                   logout_error_template='djangosaml2/logout_error.html'):
+                      logout_error_template='djangosaml2/logout_error.html'):
     """SAML Logout Response endpoint
 
     The IdP will send the logout response to this view,
@@ -357,6 +358,7 @@ def register_namespace_prefixes():
     from saml2 import md, saml, samlp
     import xmlenc
     import xmldsig
+
     prefixes = (('saml', saml.NAMESPACE),
                 ('samlp', samlp.NAMESPACE),
                 ('md', md.NAMESPACE),
@@ -368,5 +370,6 @@ def register_namespace_prefixes():
     else:
         for prefix, namespace in prefixes:
             ElementTree._namespace_map[namespace] = prefix
+
 
 register_namespace_prefixes()
