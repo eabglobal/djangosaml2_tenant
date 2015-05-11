@@ -22,9 +22,9 @@ def read(*rnames):
 
 
 setup(
-    name='djangosaml2',
+    name='djangosaml2_tenant',
     version='0.13.0',
-    description='pysaml2 integration in Django',
+    description='pysaml2 integration for multi-tenant in Django',
     long_description='\n\n'.join([read('README'), read('CHANGES')]),
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -37,7 +37,7 @@ setup(
         "Topic :: Security",
         "Topic :: Software Development :: Libraries :: Application Frameworks",
         ],
-    keywords="django,pysaml2,saml2,federated authentication,authentication",
+    keywords="django,pysaml2,saml2,federated authentication,multi-tenant",
     author="Yaco Sistemas",
     author_email="lgs@yaco.es",
     url="https://bitbucket.org/lgs/djangosaml2",
