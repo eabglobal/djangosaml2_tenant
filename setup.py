@@ -1,4 +1,5 @@
-# Copyright (C) 2011-2012 Yaco Sistemas <lgs@yaco.es>
+# Copyright (C) 2015 Education Advisory Board
+# Copyright (C) 2011-2012 Yaco Sistemas
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +24,7 @@ def read(*rnames):
 
 setup(
     name='djangosaml2_tenant',
-    version='0.13.0',
+    version='0.20.0',
     description='pysaml2 integration for multi-tenant in Django',
     long_description='\n\n'.join([read('README'), read('CHANGES')]),
     classifiers=[
@@ -38,9 +39,9 @@ setup(
         "Topic :: Software Development :: Libraries :: Application Frameworks",
         ],
     keywords="django,pysaml2,saml2,federated authentication,multi-tenant",
-    author="Yaco Sistemas",
-    author_email="lgs@yaco.es",
-    url="https://bitbucket.org/lgs/djangosaml2",
+    author="Education Advisory Board",
+    author_email="msensenbrenn@eab.com",
+    url="https://github.com/advisory/djangosaml2_tenant",
     license='Apache 2.0',
     packages=find_packages(),
     include_package_data=True,
