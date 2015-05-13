@@ -29,12 +29,6 @@ except ImportError:
 
 logger = logging.getLogger('djangosaml2')
 
-# Django 1.5 Custom user model
-try:
-    User = auth.get_user_model()
-except AttributeError:
-    User = auth.models.User
-
 
 class Saml2Backend(ModelBackend):
     def __init__(self, **kwargs):
@@ -92,6 +86,7 @@ class Saml2Backend(ModelBackend):
         # Note that this could be accomplished in one try-except clause, but
         # instead we use get_or_create when creating unknown users since it has
         # built-in safeguards for multiple threads.
+        User = auth.get_user_model()
         if create_unknown_user:
             logger.debug('Check if the user "%s" exists or create otherwise'
                          % main_attribute)
