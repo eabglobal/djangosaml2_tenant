@@ -1,4 +1,5 @@
 # Copyright (C) 2015 Education Advisory Board
+# Copyright (C) 2011-2012 Yaco Sistemas
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +24,7 @@ def read(*rnames):
 
 setup(
     name='djangosaml2_tenant',
-    version='0.1.0',
+    version='0.20.0',
     description='pysaml2 integration for multi-tenant in Django',
     long_description='\n\n'.join([read('README'), read('CHANGES')]),
     classifiers=[
