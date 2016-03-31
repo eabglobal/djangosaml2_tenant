@@ -19,6 +19,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 from django.core.files.storage import default_storage
+from django.db.models.loading import get_model
 
 from saml2.config import SPConfig
 
@@ -88,6 +89,10 @@ def config_settings_loader(request):
         tenant_config["metadata"]["local"] = local_files
     if "remote" in settings.SAML_CONFIG["metadata"]:
         tenant_config["metadata"]["remote"] = settings.SAML_CONFIG["metadata"]["remote"][request.tenant.schema_name]
+    if "inline" in settings.SAML_CONFIG["metadata"]:
+        if request.tenant.get_saml_metadata():
+            tenant_config["metadata"]["inline"] = [request.tenant.get_saml_metadata(),]
+
     tenant_config["service"]["sp"]["endpoints"] = get_endpoints(request)
     conf.load(tenant_config)
 
