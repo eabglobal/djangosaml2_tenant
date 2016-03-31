@@ -89,7 +89,7 @@ def config_settings_loader(request):
         tenant_config["metadata"]["local"] = local_files
     if "remote" in settings.SAML_CONFIG["metadata"]:
         tenant_config["metadata"]["remote"] = settings.SAML_CONFIG["metadata"]["remote"][request.tenant.schema_name]
-    if "inline" in settings.SAML_CONFIG["metadata"]:
+    if settings.SAML_CONFIG["metadata"].get('inline') == 'DB':
         if request.tenant.get_saml_metadata():
             tenant_config["metadata"]["inline"] = [request.tenant.get_saml_metadata(),]
 
