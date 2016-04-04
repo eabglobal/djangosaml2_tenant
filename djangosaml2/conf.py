@@ -60,13 +60,14 @@ def get_config_loader(path, request=None):
 
 
 def config_settings_loader(request):
-    """Utility function to load the pysaml2 configuration.
+    """Utility function to load the pysaml2 configuration for a single tenant/member/schema.
 
     This is also the default config loader.
     This sets the metadata to depend on the tenant
     """
     conf = SPConfig()
     tenant_config = copy.deepcopy(settings.SAML_CONFIG)
+
     if "local" in settings.SAML_CONFIG["metadata"]:
         default_storage_objects = settings.SAML_CONFIG["metadata"]["local"][request.tenant.schema_name]
         # Local files might be s3 objects
@@ -86,8 +87,16 @@ def config_settings_loader(request):
                     open_file.write(file_content)
             local_files.append(path)
         tenant_config["metadata"]["local"] = local_files
+
     if "remote" in settings.SAML_CONFIG["metadata"]:
         tenant_config["metadata"]["remote"] = settings.SAML_CONFIG["metadata"]["remote"][request.tenant.schema_name]
+
+    # If SAML metadata can specified inline, SAML_CONFIG['metadata']['inline'] is supposed to contain valid XML metadata
+    # But if we simply put the 'DB' placeholder value there instead of valid XML, ask tenant.Member to get the XML
+    # metadata from the DB for the requesting tenant/member/schema.
+    if settings.SAML_CONFIG['metadata'].get('inline') == 'DB':
+        tenant_config['metadata']['inline'] = [request.tenant.get_saml_metadata(), ]
+
     tenant_config["service"]["sp"]["endpoints"] = get_endpoints(request)
     conf.load(tenant_config)
 
