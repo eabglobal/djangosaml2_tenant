@@ -1,4 +1,4 @@
-class SAMLMetadataIsNoneException(Exception):
+class MissingSAMLMetadataException(Exception):
     """
     This exception is thrown when 'DB' is used but metadata is not set in DB
     """

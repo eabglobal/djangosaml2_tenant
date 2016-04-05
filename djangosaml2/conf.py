@@ -25,7 +25,7 @@ from saml2.config import SPConfig
 import djangosaml2
 from djangosaml2.utils import get_custom_setting, get_endpoints
 
-from .exceptions import SAMLMetadataIsNoneException
+from .exceptions import MissingSAMLMetadataException
 
 
 BASE_PATH = getattr(settings, 'SAML2_IDP_BASE_DIR', os.path.dirname(djangosaml2.__file__))
@@ -101,7 +101,7 @@ def config_settings_loader(request):
         if metadata:
             tenant_config['metadata']['inline'] = [metadata, ]
         else:
-            raise SAMLMetadataIsNoneException("SAML metadata is not specified")
+            raise MissingSAMLMetadataException("SAML metadata is not specified")
 
     tenant_config["service"]["sp"]["endpoints"] = get_endpoints(request)
     conf.load(tenant_config)
