@@ -25,6 +25,8 @@ from saml2.config import SPConfig
 import djangosaml2
 from djangosaml2.utils import get_custom_setting, get_endpoints
 
+from .exceptions import SAMLMetadataIsNoneException
+
 
 BASE_PATH = getattr(settings, 'SAML2_IDP_BASE_DIR', os.path.dirname(djangosaml2.__file__))
 
@@ -95,7 +97,11 @@ def config_settings_loader(request):
     # But if we simply put the 'DB' placeholder value there instead of valid XML, ask tenant.Member to get the XML
     # metadata from the DB for the requesting tenant/member/schema.
     if settings.SAML_CONFIG['metadata'].get('inline') == 'DB':
-        tenant_config['metadata']['inline'] = [request.tenant.get_saml_metadata(), ]
+        metadata = request.tenant.get_saml_metadata()
+        if metadata:
+            tenant_config['metadata']['inline'] = [metadata, ]
+        else:
+            raise SAMLMetadataIsNoneException("SAML metadata is not specified")
 
     tenant_config["service"]["sp"]["endpoints"] = get_endpoints(request)
     conf.load(tenant_config)
