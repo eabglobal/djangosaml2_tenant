@@ -6,4 +6,13 @@ Changes
 - Initial version based on djangosaml2 supporting multi-tenant
 
 0.20.1 (2016-04-06)
-- Make djangosmal2 tenant support reading metadata from database
+- Make djangosaml2 tenant support reading metadata from database by adding the following to settings.py:
+    SAML_CONFIG.update({
+        # Specifying 'inline': 'DB' means SAML metadata comes from the DB via the following method:
+        # tenant/models/Member.get_saml_metadata(self)
+        # Implement this method to retrieve the metadata from the table of your choice.
+        'metadata': {
+            'inline': 'DB',
+        },
+        ...
+    })
