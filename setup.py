@@ -24,7 +24,7 @@ def read(*rnames):
 
 setup(
     name='djangosaml2_tenant',
-    version='0.20.0',
+    version='0.20.1',
     description='pysaml2 integration for multi-tenant in Django',
     long_description='\n\n'.join([read('README'), read('CHANGES')]),
     classifiers=[
