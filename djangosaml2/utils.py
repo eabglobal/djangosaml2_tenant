@@ -13,8 +13,6 @@
 # limitations under the License.
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
-import saml2
 
 
 def get_custom_setting(name, default=None):
@@ -36,19 +34,6 @@ def available_idps(config, langpref=None):
             idps = idps.union(set(result.keys()))
 
     return dict([(idp, config.metadata.name(idp, langpref)) for idp in idps])
-
-
-def get_endpoints(request):
-    protocal = 'https' if request.is_secure() else 'http'
-    return {
-        # url and binding to the assetion consumer service view
-        # do not change the binding or service name
-        'assertion_consumer_service': [
-            ('{}://{}:{}{}'.format(protocal, request.tenant.domain_url, request.META['SERVER_PORT'],
-                                   reverse('saml2_acs')),
-             saml2.BINDING_HTTP_POST),
-        ],
-    }
 
 
 def get_location(http_info):
