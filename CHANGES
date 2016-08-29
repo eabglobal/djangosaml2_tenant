@@ -16,3 +16,10 @@ Changes
         },
         ...
     })
+
+0.22.0 (2016-08-29)
+- Removed the logic of loading metadata from database model tenant.Member. Projects using this app can specify
+  their own config loader using the SAML_CONFIG_LOADER setting. This change provides more flexibility in-terms
+  of loading config from any data-source.
+- Also, removed the caching of service provider config objects as per the same logic as above. Individual
+  projects using this app can use their own config loader which handles caching scenarios.
